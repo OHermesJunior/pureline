@@ -7,7 +7,7 @@
 # arg: $1 is foreground color of the next section
 # arg: $2 is background color of the next section
 function section_end {
-    if [ "$__last_color" == "$2" ]; then
+    if [[ "$__last_color" == "$2" ]]; then
         # Section colors are the same, use a foreground separator
         local end_char="${PL_SYMBOLS[soft_separator]}"
         local fg="$1"
@@ -16,7 +16,7 @@ function section_end {
         local end_char="${PL_SYMBOLS[hard_separator]}"
         local fg="$__last_color"
     fi
-    if [ -n "$__last_color" ]; then
+    if [[ -n "$__last_color" ]]; then
         echo "${PL_COLORS[$fg]}${PL_COLORS[On_$2]}$end_char"
     fi
 }
@@ -51,7 +51,7 @@ function prompt_char {
 function time_module {
     local bg_color="$1"
     local fg_color="$2"
-    if [ "$PL_TIME_SHOW_SECONDS" = true ]; then
+    if [[ "$PL_TIME_SHOW_SECONDS" = true ]]; then
         local content="\t"
     else
         local content="\A"
@@ -73,8 +73,8 @@ function user_module {
     local fg_color="$2"
     local content="\u"
     # Show host if true or when user is remote/root
-    if [ "$PL_USER_SHOW_HOST" = true ]; then
-        if [ "$PL_USER_USE_IP" = true ]; then
+    if [[ "$PL_USER_SHOW_HOST" = true ]]; then
+        if [[ "$PL_USER_USE_IP" = true ]]; then
             content+="@$(ip_address)"
         else
             content+="@\h"
@@ -97,8 +97,8 @@ function ssh_module {
         local bg_color="$1"
         local fg_color="$2"
         local content="${PL_SYMBOLS[ssh]}"
-        if [ "$PL_SSH_SHOW_HOST" = true ]; then
-            if [ "$PL_SSH_USE_IP" = true ]; then
+        if [[ "$PL_SSH_SHOW_HOST" = true ]]; then
+            if [[ "$PL_SSH_USE_IP" = true ]]; then
                 content+=" $(ip_address)"
             else
                 content+=" \h"
@@ -120,9 +120,9 @@ function path_module {
     local bg_color="$1"
     local fg_color="$2"
     local content="\w"
-    if [ "$PL_PATH_TRIM" -eq 1 ]; then
+    if [[ "$PL_PATH_TRIM" -eq 1 ]]; then
         local content="\W"
-    elif [ "$PL_PATH_TRIM" -gt 1 ]; then
+    elif [[ "$PL_PATH_TRIM" -gt 1 ]]; then
         PROMPT_DIRTRIM="$PL_PATH_TRIM"
     fi
     PS1+="$(section_end "$fg_color" "$bg_color")"
@@ -139,7 +139,7 @@ function background_jobs_module {
     local fg_color="$2"
     local number_jobs
     number_jobs=$(jobs -p | wc -l)
-    if [ ! "$number_jobs" -eq 0 ]; then
+    if [[ ! "$number_jobs" -eq 0 ]]; then
         PS1+="$(section_end "$fg_color" "$bg_color")"
         PS1+="$(section_content "$fg_color" "$bg_color" " ${PL_SYMBOLS[background_jobs]} $number_jobs ")"
         __last_color="$bg_color"
@@ -153,7 +153,7 @@ function background_jobs_module {
 function read_only_module {
     local bg_color="$1"
     local fg_color="$2"
-    if [ ! -w "$PWD" ]; then
+    if [[ ! -w "$PWD" ]]; then
         PS1+="$(section_end "$fg_color" "$bg_color")"
         PS1+="$(section_content "$fg_color" "$bg_color" " ${PL_SYMBOLS[read_only]} ")"
         __last_color="$bg_color"
@@ -175,71 +175,71 @@ function read_only_module {
 function git_module {
     local git_branch
     git_branch=$(git rev-parse --abbrev-ref HEAD 2> /dev/null)
-    if [ -n "$git_branch" ]; then
+    if [[ -n "$git_branch" ]]; then
         local bg_color="$1"
         local fg_color="$2"
         local content="${PL_SYMBOLS[git_branch]} $git_branch"
 
-        if [ "$PL_GIT_STASH" = true ]; then
+        if [[ "$PL_GIT_STASH" = true ]]; then
             local number_stash
             number_stash="$(git stash list 2>/dev/null | wc -l)"
-            if [ ! "$number_stash" -eq 0 ]; then
+            if [[ ! "$number_stash" -eq 0 ]]; then
                 content+="${PL_SYMBOLS[git_stash]}$number_stash"
             fi
         fi
 
-        if [ "$PL_GIT_AHEAD" = true ]; then
+        if [[ "$PL_GIT_AHEAD" = true ]]; then
             local number_behind_ahead
             number_behind_ahead="$(git rev-list --count --left-right '@{upstream}...HEAD' 2>/dev/null)"
             local number_ahead="${number_behind_ahead#*	}"
             local number_behind="${number_behind_ahead%	*}"
-            if [ ! "0$number_ahead" -eq 0 ] || [ ! "0$number_behind" -eq 0 ]; then
-                if [ ! "$number_ahead" -eq 0 ]; then
+            if [[ ! "0$number_ahead" -eq 0 ]] || [[ ! "0$number_behind" -eq 0 ]]; then
+                if [[ ! "$number_ahead" -eq 0 ]]; then
                     content+="${PL_SYMBOLS[git_ahead]}$number_ahead"
                 fi
-                if [ ! "$number_behind" -eq 0 ]; then
+                if [[ ! "$number_behind" -eq 0 ]]; then
                     content+="${PL_SYMBOLS[git_behind]}$number_behind"
                 fi
             fi
         fi
 
-        if [ "$PL_GIT_STAGED" = true ]; then
+        if [[ "$PL_GIT_STAGED" = true ]]; then
             local number_staged
             number_staged="$(git diff --staged --name-only --diff-filter=AM 2> /dev/null | wc -l)"
-            if [ ! "$number_staged" -eq "0" ]; then
+            if [[ ! "$number_staged" -eq "0" ]]; then
                 content+=" ${PL_SYMBOLS[soft_separator]} ${PL_SYMBOLS[git_staged]}$number_staged"
             fi
         fi
 
-        if [ "$PL_GIT_CONFLICTS" = true ]; then
+        if [[ "$PL_GIT_CONFLICTS" = true ]]; then
             local number_conflicts
             number_conflicts="$(git diff --name-only --diff-filter=U 2> /dev/null | wc -l)"
-            if [ ! "$number_conflicts" -eq "0" ]; then
+            if [[ ! "$number_conflicts" -eq "0" ]]; then
                 content+=" ${PL_SYMBOLS[soft_separator]} ${PL_SYMBOLS[git_conflicts]}$number_conflicts"
             fi
         fi
 
-        if [ "$PL_GIT_MODIFIED" = true ]; then
+        if [[ "$PL_GIT_MODIFIED" = true ]]; then
             local number_modified
             number_modified="$(git diff --name-only --diff-filter=M 2> /dev/null | wc -l )"
-            if [ ! "$number_modified" -eq "0" ]; then
+            if [[ ! "$number_modified" -eq "0" ]]; then
                 content+=" ${PL_SYMBOLS[soft_separator]} ${PL_SYMBOLS[git_modified]}$number_modified"
             fi
         fi
 
-        if [ "$PL_GIT_UNTRACKED" = true ]; then
+        if [[ "$PL_GIT_UNTRACKED" = true ]]; then
             local number_untracked
             number_untracked="$(git ls-files --other --exclude-standard | wc -l)"
-            if [ ! "$number_untracked" -eq "0" ]; then
+            if [[ ! "$number_untracked" -eq "0" ]]; then
                 content+=" ${PL_SYMBOLS[soft_separator]} ${PL_SYMBOLS[git_untracked]}$number_untracked"
             fi
         fi
 
-        if [ -n "$(git status --porcelain)" ]; then
-            if [ -n "$PL_GIT_DIRTY_FG" ]; then
+        if [[ -n "$(git status --porcelain)" ]]; then
+            if [[ -n "$PL_GIT_DIRTY_FG" ]]; then
                 fg_color="$PL_GIT_DIRTY_FG"
             fi
-            if [ -n "$PL_GIT_DIRTY_BG" ]; then
+            if [[ -n "$PL_GIT_DIRTY_BG" ]]; then
                 bg_color="$PL_GIT_DIRTY_BG"
             fi
         fi
@@ -255,7 +255,7 @@ function git_module {
 # arg: $1 foreground color
 # arg; $2 background color
 function virtual_env_module {
-    if [ -n "$VIRTUAL_ENV" ]; then
+    if [[ -n "$VIRTUAL_ENV" ]]; then
         local venv="${VIRTUAL_ENV##*/}"
         local bg_color="$1"
         local fg_color="$2"
@@ -276,9 +276,9 @@ function battery_module {
     local batt_dir
     local content
     local batt_dir="/sys/class/power_supply/BAT"
-    if [ -d $batt_dir"0" ]; then
+    if [[ -d $batt_dir"0" ]]; then
         batt_dir=$batt_dir"0"
-    elif [ -d $batt_dir"1" ]; then
+    elif [[ -d $batt_dir"1" ]]; then
         batt_dir=$batt_dir"1"
     else
         return 1
@@ -288,7 +288,7 @@ function battery_module {
     local status
     status="$(<"$batt_dir/status")"
 
-    if [ "$status" == "Discharging" ]; then
+    if [[ "$status" == "Discharging" ]]; then
         content="${PL_SYMBOLS[battery_discharging]} "
     else
         content="${PL_SYMBOLS[battery_charging]}"
@@ -319,7 +319,7 @@ function prompt_module {
 # arg: $1 foreground color
 # arg; $2 background color
 function return_code_module {
-    if [ ! "$__return_code" -eq 0 ]; then
+    if [[ ! "$__return_code" -eq 0 ]]; then
         local bg_color="$1"
         local fg_color="$2"
         local content=" ${PL_SYMBOLS[return_code]} $__return_code "
@@ -332,7 +332,7 @@ function return_code_module {
 # -----------------------------------------------------------------------------
 # append to prompt: end the current promptline and start a newline
 function newline_module {
-    if [ -n "$__last_color" ]; then
+    if [[ -n "$__last_color" ]]; then
         PS1+="$(section_end "$__last_color" 'Default')"
     fi
     PS1+="\n"
@@ -369,7 +369,7 @@ function pureline_ps1 {
     done
 
     # final end point
-    if [ -n "$__last_color" ]; then
+    if [[ -n "$__last_color" ]]; then
         PS1+="$(section_end "$__last_color" 'Default')"
     else
         # No modules loaded, set a basic prompt
@@ -378,7 +378,7 @@ function pureline_ps1 {
 
     # cleanup
     PS1+="${PL_COLORS[Color_Off]}"
-    if [ "$PL_ERASE_TO_EOL" = true ]; then
+    if [[ "$PL_ERASE_TO_EOL" = true ]]; then
         PS1+="\[\e[K\]"
     fi
     PS1+=" "
@@ -439,11 +439,11 @@ declare -A PL_SYMBOLS=(
 [battery_discharging]="▬ "
 )
 # check if an argument has been given for a config file
-if [ -f "$1" ]; then
+if [[ -f "$1" ]]; then
     source "$1"
 fi
 # ensure some modules have been defined
-if [ -z "$PL_MODULES" ]; then
+if [[ -z "$PL_MODULES" ]]; then
     # define default modules to load
     declare -a PL_MODULES=(
     'user_module        Yellow      Black'
@@ -458,7 +458,7 @@ fi
 # grab a snapshot of the systems PROMPT_COMMAND. this can then be
 # appended to pureline when sourced without continually appending
 # pureline to itself.
-if [ -z "$__PROMPT_COMMAND" ]; then 
+if [[ -z "$__PROMPT_COMMAND" ]]; then 
     __PROMPT_COMMAND="$PROMPT_COMMAND"
 fi
 
