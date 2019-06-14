@@ -37,7 +37,7 @@ function ip_address {
 }
 
 #------------------------------------------------------------------------------
-# Helper function to return normal or super uoer prompt character
+# Helper function to return normal or super user prompt character
 function prompt_char {
     [[ ${EUID} -eq 0 ]] && echo "#" || echo "$"
 }
@@ -309,6 +309,14 @@ function prompt_module {
     local fg_color="$2"
     local content
     content=" $(prompt_char) "
+    if [[ ${EUID} -eq 0 ]]; then
+        if [[ -n "$PL_PROMPT_ROOT_FG" ]]; then
+            fg_color="$PL_PROMPT_ROOT_FG"
+        fi
+        if [[ -n "$PL_PROMPT_ROOT_BG" ]]; then
+            bg_color="$PL_PROMPT_ROOT_BG"
+        fi
+    fi
     PS1+="$(section_end "$fg_color" "$bg_color")"
     PS1+="$(section_content "$fg_color" "$bg_color" "$content")"
     __last_color="$bg_color"
