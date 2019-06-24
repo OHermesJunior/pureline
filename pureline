@@ -59,7 +59,7 @@ function ip_address {
 #------------------------------------------------------------------------------
 # Helper function to return normal or super user prompt character
 function prompt_char {
-    [[ ${EUID} -eq 0 ]] && echo "#" || echo "$"
+    [[ ${EUID} -eq 0 ]] && echo "${PL_SYMBOLS[root_prompt]}" || echo "${PL_SYMBOLS[normal_prompt]}"
 }
 
 # -----------------------------------------------------------------------------
@@ -459,6 +459,9 @@ declare -A PL_COLORS=(
 declare -A PL_SYMBOLS=(
     [hard_separator]="▶"
     [soft_separator]="│"
+
+    [normal_prompt]="$"
+    [root_prompt]="#"
 
     [git_branch]="╬"
     [git_untracked]="?"
