@@ -71,10 +71,11 @@ function prompt_char {
 function time_module {
     local bg_color="$1"
     local fg_color="$2"
+    local content="${PL_SYMBOLS[time]}"
     if [[ "$PL_TIME_SHOW_SECONDS" = true ]]; then
-        local content="\t"
+        content+="\t"
     else
-        local content="\A"
+        content+="\A"
     fi
     PS1+="$(section_end "$fg_color" "$bg_color")"
     PS1+="$(section_content "$fg_color" "$bg_color" " $content ")"
@@ -460,6 +461,7 @@ declare -A PL_SYMBOLS=(
     [hard_separator]="▶"
     [soft_separator]="│"
 
+    [time]=""
     [normal_prompt]="$"
     [root_prompt]="#"
 
